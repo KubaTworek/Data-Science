@@ -129,6 +129,47 @@ Wykres histogramu wraz z krzywą gęstości rozkładu (KDE) pokazuje, jak rozkł
 
 Wykres ten dostarcza nam kluczowych informacji na temat struktury danych i pomaga w podjęciu decyzji, jak dalej postępować w procesie modelowania. Na przykład, jeśli zauważymy dużą liczbę wartości odstających, możemy rozważyć ich usunięcie, co potencjalnie poprawi jakość naszego modelu regresji.
 
+### Sprawdzanie wariancji cech
+
+#### 1. Cel sprawdzania wariancji cech
+Sprawdzanie wariancji cech to proces mający na celu ocenę, jak bardzo wartości w danej kolumnie (zmiennej) są rozproszone wokół średniej. Wariancja pokazuje nam, jak bardzo dane są "rozproszone" — czyli jak szeroko są rozłożone wartości danej cechy w naszym zbiorze danych.
+
+Wariancja mierzy, jak daleko wartości danej zmiennej są od jej średniej. Matematycznie, wariancja to średnia kwadratowa różnic pomiędzy wartościami a średnią tej cechy.
+
+#### 2. Interpretacja wartości wariancji
+
+- **Niska wariancja** oznacza, że wartości danej zmiennej są blisko siebie (są mniej zróżnicowane).
+- **Wysoka wariancja** oznacza, że wartości są szeroko rozproszone (są bardziej zróżnicowane).
+
+Przykładowo:
+- Jeśli cecha, taka jak "liczba pokoi" (RM), ma niską wariancję, to większość domów w zbiorze danych ma zbliżoną liczbę pokoi.
+- Wysoka wariancja wskazuje na to, że liczba pokoi jest bardziej zróżnicowana, co oznacza, że w zbiorze danych są domy zarówno z małą, jak i dużą liczbą pokoi.
+
+#### 3. Co możemy zrobić z tymi informacjami?
+
+Wariancja może pomóc w kilku aspektach analizy danych:
+- **Wybór istotnych cech do modelu**: Jeśli jakaś cecha ma **bardzo niską wariancję**, to może być mało przydatna w modelowaniu, ponieważ nie wnosi znaczących informacji. Na przykład, jeśli prawie wszystkie domy mają tę samą liczbę pokoi, cecha ta nie wpłynie na przewidywanie ceny domów. Możemy rozważyć usunięcie cech o zbyt niskiej wariancji, ponieważ mogą one nie mieć istotnego wpływu na model.
+
+- **Zrozumienie zmienności w danych**: Wariancja pozwala zrozumieć, które cechy są bardziej zmienne, co może mieć wpływ na wyniki modelowania. Cechy o dużej zmienności mogą bardziej wpływać na zmienną zależną (np. cenę domu).
+
+- **Standaryzacja**: Cechy o dużych wariancjach mogą dominować nad innymi podczas trenowania modelu, co może wpłynąć na wyniki. Aby temu zapobiec, często wykonuje się standaryzację danych (czyli normalizację do średniej 0 i odchylenia standardowego 1), aby zmienne miały porównywalny wpływ na model.
+
+#### 4. Jak rozumieć wartości?
+- **Wartości wariancji** są liczbami dodatnimi, które mogą mieć bardzo różne zakresy w zależności od cechy. Zależy to od tego, w jakich jednostkach są mierzone wartości tej cechy.
+  - Wariancja dla cechy takiej jak "cena domów" (w tysiącach dolarów) może być znacznie większa niż wariancja dla cechy "liczba pokoi" (która wynosi zwykle od 1 do 10).
+
+- **Wysokie wartości wariancji** wskazują na duże rozproszenie danych i mogą oznaczać, że dana cecha może mieć większy wpływ na wynik modelu.
+
+- **Niskie wartości wariancji** mogą sugerować, że cecha jest stała lub prawie stała i może nie być użyteczna do przewidywań.
+
+#### Przykład:
+Jeśli cecha "RAD" (dostępność autostrad) ma bardzo niską wariancję, oznacza to, że prawie wszystkie domy w zbiorze danych mają podobny dostęp do autostrad. Taka informacja może nie wnosić wiele do modelu, ponieważ nie różnicuje domów pod względem dostępności dróg.
+
+#### Podsumowanie:
+- **Niska wariancja**: Cechy o bardzo niskiej wariancji mogą być mniej przydatne do modelowania i można rozważyć ich usunięcie.
+- **Wysoka wariancja**: Cechy o wysokiej wariancji są bardziej zróżnicowane i mogą mieć większy wpływ na wynik modelu.
+- Wariancja pozwala zrozumieć strukturę danych i podejmować świadome decyzje dotyczące wyboru cech do modelu oraz ewentualnej standaryzacji danych.
+
 ### Korelacja zmiennych z ceną domów (MEDV)
 
 ![correlation_matrix_plot.png](charts/correlation_matrix_plot.png)
@@ -175,39 +216,35 @@ Wykres ten jest bardzo przydatny przy analizie danych, ponieważ:
 
 Wykres macierzy korelacji dostarcza kluczowych informacji na temat relacji pomiędzy zmiennymi w naszym zbiorze danych. Na jego podstawie możemy wybrać istotne cechy do modelowania, usunąć zmienne nadmiarowe oraz podjąć decyzję o ewentualnych transformacjach, co poprawi jakość modelu regresji.
 
-### Boxplot dla istotnych cech.
+### Analiza rozkładu zmiennych
 
-![boxplott.png](charts/boxplott.png)
-#### Wykres boxplot dla istotnych cech
+![img.png](img.png)
 
-Boxplot (wykres pudełkowy) tworzymy, aby zidentyfikować rozkład wartości dla poszczególnych cech oraz znaleźć potencjalne wartości odstające (outliers). Boxplot jest doskonałym narzędziem do wizualizacji takich cech jak mediana, kwartyle oraz wartości odstające w danych. Dla każdej zmiennej (w tym przypadku dla cech **RM**, **PTRATIO**, **LSTAT**) możemy zobaczyć ich rozkład, a także porównać zmienne między sobą.
+Histogramy są używane do wizualizacji **rozkładu zmiennych**. Dzięki nim możemy zrozumieć, jak wartości danej cechy są rozmieszczone w naszym zbiorze danych. Na podstawie tych wykresów możemy podjąć różne decyzje dotyczące dalszej obróbki danych.
 
-#### Jak czytać ten wykres?
+#### Interpretacja zmiennych na wykresie:
+1. **RM (Średnia liczba pokoi na dom)**:
+  - Widać, że większość domów ma średnio między 5 a 7 pokoi, co oznacza, że wartość ta jest stosunkowo skupiona wokół tej liczby.
+  - Rozkład jest lekko prawoskośny, co oznacza, że są domy z większą liczbą pokoi, ale stanowią one mniejszość.
+  - Z tego histogramu możemy wywnioskować, że wartość ta nie jest równomiernie rozłożona, ale jest skoncentrowana wokół kilku typowych wartości.
 
-- **Środkowa linia w pudełku** reprezentuje medianę (wartość środkową danych).
-- **Dolna i górna krawędź pudełka** to odpowiednio pierwszy i trzeci kwartyl (Q1 i Q3), które obejmują środkowe 50% wartości danych.
-- **Wąsy** (linie rozciągające się od pudełka) pokazują minimalne i maksymalne wartości w zakresie 1.5 * IQR (Interquartile Range).
-- **Kropki powyżej i poniżej wąsów** reprezentują wartości odstające (outliers), które leżą poza 1.5 * IQR.
+2. **PTRATIO (Stosunek liczby uczniów do nauczycieli)**:
+  - Wskaźnik PTRATIO ma wyraźnie skupione wartości w jednym zakresie, co może sugerować, że większość miast ma podobny poziom edukacji (około 20 uczniów na nauczyciela).
+  - Taki rozkład może sugerować, że cecha ma niski wpływ na różnicowanie danych, ponieważ większość wartości znajduje się w jednym przedziale.
 
-#### Informacje, które otrzymujemy:
+3. **LSTAT (Procent populacji o niskim statusie społecznym)**:
+  - Widać, że rozkład LSTAT ma tendencję do skupiania się wokół niższych wartości, co oznacza, że w wielu przypadkach populacja o niskim statusie społecznym jest stosunkowo mała.
+  - Jednak jest pewna liczba przypadków z wyższymi wartościami, co wskazuje na to, że niektóre obszary mają większy odsetek osób o niskim statusie społecznym.
 
-- **RM (średnia liczba pokoi)**: Wartości tej zmiennej są stosunkowo skupione wokół mediany (5-6 pokoi), ale widzimy kilka wartości odstających poniżej dolnej granicy (mniej niż 5 pokoi). Te wartości mogą wpływać na predykcję modelu i mogą wymagać dalszej analizy.
+#### Co możemy zrobić z tymi informacjami?
+- **Transformacja zmiennych**: Jeśli rozkłady są bardzo niesymetryczne (np. RM lub LSTAT), możemy zastosować **transformację logarytmiczną** lub inną przekształcającą zmienną, aby uzyskać bardziej symetryczny rozkład, co może poprawić działanie modeli.
 
-- **PTRATIO (stosunek uczniów do nauczycieli)**: Zmienna ta ma bardziej jednolity rozkład, ale widzimy kilka wartości odstających poniżej dolnej granicy. Wartości odstające mogą wskazywać na nietypowe szkoły lub lokalizacje z niskim stosunkiem uczniów do nauczycieli.
+- **Standaryzacja danych**: Ponieważ zmienne mają różne jednostki i zakresy wartości, przed budową modeli warto je **standaryzować**, aby zmienne o większej rozpiętości (np. LSTAT) nie miały większego wpływu na modelowanie niż zmienne o mniejszym zakresie (np. PTRATIO).
 
-- **LSTAT (procent populacji o niskim statusie ekonomicznym)**: Zmienna ta ma szerszy zakres wartości. Widzimy liczne wartości odstające, zwłaszcza w górnym zakresie, co sugeruje, że w niektórych lokalizacjach jest bardzo wysoki odsetek populacji o niskim statusie ekonomicznym. To może znacząco wpływać na ceny domów, ponieważ wysokie wartości tej cechy są negatywnie skorelowane z ceną domów.
-
-#### Co możemy z tym zrobić?
-
-- **Obsługa wartości odstających (outliers)**: Boxplot pokazuje nam, które wartości mogą być wartościami odstającymi. Wartości te mogą wpływać na modelowanie i powodować błędy w przewidywaniach. Możemy rozważyć ich usunięcie lub przekształcenie.
-
-- **Standaryzacja i normalizacja danych**: Jeżeli różnice w rozkładzie zmiennych są znaczne, można zastosować metody przekształcania zmiennych, np. logarytmowanie lub standaryzację, aby wyrównać ich wpływ na model.
-
-- **Analiza wpływu zmiennych**: Boxplot pomaga ocenić zmienne o dużym rozrzucie, które mogą bardziej wpływać na modelowanie. Na przykład zmienna **LSTAT** ma szeroki zakres wartości, co może sugerować, że będzie miała znaczący wpływ na przewidywania cen domów.
+- **Wykrywanie wartości odstających**: Na podstawie tych wykresów możemy także zidentyfikować potencjalne **wartości odstające** (outliers), które mogą negatywnie wpływać na model. Na przykład, w LSTAT widzimy, że istnieje kilka obszarów o bardzo wysokim odsetku populacji o niskim statusie społecznym — te punkty mogą wymagać dodatkowej analizy.
 
 #### Podsumowanie:
-
-Boxplot dostarcza nam informacji na temat rozkładu danych i obecności wartości odstających. Możemy zdecydować, które zmienne wymagają dalszej analizy, przekształcenia lub oczyszczenia z wartości odstających, aby poprawić dokładność modelu predykcyjnego.
+Histogramy pozwalają szybko zrozumieć strukturę danych i ocenić, czy konieczne będą dodatkowe transformacje zmiennych. Mogą także pomóc w identyfikacji wartości odstających i nierównomiernie rozłożonych cech, które mogą wpłynąć na wyniki modelowania.
 
 ### Scatterplot (punktowy wykres rozproszenia)
 
@@ -241,7 +278,40 @@ Scatterplot (punktowy wykres rozproszenia) tworzymy, aby zobaczyć relacje międ
 #### Podsumowanie:
 Wykres scatterplot pozwala nam zidentyfikować, które zmienne są silnie skorelowane z ceną domów, a które mają mniejszy wpływ. Pomaga też w identyfikacji wartości odstających oraz zależności nieliniowych, co może prowadzić do decyzji o dalszej obróbce danych lub zastosowaniu odpowiednich modeli predykcyjnych.
 
-### Standaryzacja zmiennych. 
+### Transformacje cech
+
+![img_1.png](img_1.png)
+
+Wykres przedstawia rozkład trzech wybranych cech (**RM**, **PTRATIO**, **LSTAT**) po zastosowaniu **transformacji logarytmicznej**. Tego typu transformacja jest stosowana, aby:
+
+1. **Poprawić symetrię rozkładu**: Transformacja logarytmiczna ma na celu zmniejszenie wpływu wartości odstających i rozciągnięcie obszarów, gdzie wartości są mocno skupione. Wartości nieliniowe stają się bardziej "rozciągnięte", co może pomóc uzyskać bardziej symetryczny rozkład. To szczególnie przydatne, gdy dane są silnie skośne.
+
+2. **Zredukować wpływ wartości odstających**: Wartości odstające mogą mieć duży wpływ na modele liniowe. Dzięki transformacji logarytmicznej te wartości stają się mniej ekstremalne, co pomaga w stabilniejszym modelowaniu.
+
+#### Interpretacja wykresu:
+1. **RM (Średnia liczba pokoi na dom)**:
+  - Po transformacji widzimy, że rozkład stał się bardziej **symetryczny**, co sugeruje, że dane są teraz bardziej normalnie rozłożone.
+  - Dzięki temu model może lepiej radzić sobie z prognozowaniem na podstawie tej cechy.
+
+2. **PTRATIO (Stosunek liczby uczniów do nauczycieli)**:
+  - Po transformacji PTRATIO nadal wykazuje pewną koncentrację wartości, ale jest bardziej **rozciągnięty** na niższych wartościach, co sugeruje, że rozkład został wygładzony.
+  - To oznacza, że model będzie mniej wrażliwy na ekstremalne wartości tego wskaźnika.
+
+3. **LSTAT (Procent populacji o niskim statusie społecznym)**:
+  - Ta zmienna była mocno skośna przed transformacją. Po transformacji jej rozkład stał się bardziej symetryczny, co powinno poprawić efektywność modelowania.
+  - Zmniejszony wpływ wysokich wartości oznacza, że LSTAT nie będzie już dominować modelu.
+
+#### Co możemy zrobić z tymi informacjami?
+- **Lepsza jakość modelowania**: Dzięki symetryzacji rozkładu zmiennych i zredukowaniu wpływu wartości odstających, modele statystyczne lub machine learning będą bardziej stabilne i dokładniejsze.
+
+- **Przekształcenie innych cech**: Jeśli widzimy, że inne cechy w naszym zbiorze danych również mają rozkłady skośne lub są podatne na wartości odstające, możemy zastosować transformację logarytmiczną także na nich.
+
+- **Analiza po transformacji**: Warto po tej transformacji przeanalizować jakość modelu, aby sprawdzić, czy predykcje poprawiły się względem danych bez przekształceń.
+
+#### Podsumowanie:
+Transformacja logarytmiczna pomaga przekształcić nieliniowe, asymetryczne dane w bardziej symetryczny rozkład. Dzięki temu modele predykcyjne, takie jak regresja liniowa, mogą działać efektywniej, lepiej radząc sobie z danymi o dużym rozrzucie lub wartościami odstającymi.
+
+### Standaryzacja zmiennych.
 
 #### Standaryzacja: Czym jest, na czym polega i dlaczego jest potrzebna?
 
@@ -263,14 +333,14 @@ W wyniku tego przekształcenia, **wszystkie zmienne** w zbiorze danych będą mi
 #### Dlaczego dokonujemy standaryzacji?
 
 1. **Usunięcie różnic w skalach zmiennych**:
-   - Zmienne w zbiorach danych często mają różne jednostki miary. Przykładowo, w danych o nieruchomościach możemy mieć liczbę pokoi (która zwykle ma małe wartości, np. 2-8), a jednocześnie mieć cechę dotyczącą powierzchni (w metrach kwadratowych, gdzie wartości mogą wynosić od kilkudziesięciu do kilku tysięcy). W takich przypadkach modele oparte na odległościach (np. regresja liniowa, drzewa decyzyjne) mogą błędnie przypisać większe wagi zmiennym o większych wartościach.
-   - Standaryzacja "wyrównuje" te zmienne, tak aby żadna z nich nie dominowała nad innymi tylko ze względu na większą skalę.
+  - Zmienne w zbiorach danych często mają różne jednostki miary. Przykładowo, w danych o nieruchomościach możemy mieć liczbę pokoi (która zwykle ma małe wartości, np. 2-8), a jednocześnie mieć cechę dotyczącą powierzchni (w metrach kwadratowych, gdzie wartości mogą wynosić od kilkudziesięciu do kilku tysięcy). W takich przypadkach modele oparte na odległościach (np. regresja liniowa, drzewa decyzyjne) mogą błędnie przypisać większe wagi zmiennym o większych wartościach.
+  - Standaryzacja "wyrównuje" te zmienne, tak aby żadna z nich nie dominowała nad innymi tylko ze względu na większą skalę.
 
 2. **Lepsza konwergencja modeli**:
-   - Niektóre algorytmy, takie jak **regresja liniowa**, **SVM** (Support Vector Machines), czy **KNN** (K-Nearest Neighbors) są wrażliwe na różnice w skalach zmiennych. Standaryzacja pomaga w szybszej i bardziej stabilnej konwergencji algorytmów, co skraca czas treningu i poprawia wyniki.
+  - Niektóre algorytmy, takie jak **regresja liniowa**, **SVM** (Support Vector Machines), czy **KNN** (K-Nearest Neighbors) są wrażliwe na różnice w skalach zmiennych. Standaryzacja pomaga w szybszej i bardziej stabilnej konwergencji algorytmów, co skraca czas treningu i poprawia wyniki.
 
 3. **Zapobieganie nadmiernemu przywiązywaniu wagi do jednej zmiennej**:
-   - W modelach, które wyliczają wagi dla zmiennych, zmienne o większych wartościach (np. powierzchnia domu) mogą mieć nieproporcjonalnie duży wpływ na model w porównaniu do zmiennych z mniejszymi wartościami (np. liczba pokoi). Standaryzacja zapobiega takim sytuacjom, zapewniając, że model nie będzie faworyzować żadnej zmiennej tylko ze względu na jej skalę.
+  - W modelach, które wyliczają wagi dla zmiennych, zmienne o większych wartościach (np. powierzchnia domu) mogą mieć nieproporcjonalnie duży wpływ na model w porównaniu do zmiennych z mniejszymi wartościami (np. liczba pokoi). Standaryzacja zapobiega takim sytuacjom, zapewniając, że model nie będzie faworyzować żadnej zmiennej tylko ze względu na jej skalę.
 
 #### Kiedy powinniśmy stosować standaryzację?
 
@@ -370,6 +440,41 @@ Wartości, które leżą poniżej dolnej granicy lub powyżej górnej granicy, s
 #### Podsumowanie
 
 **Usuwanie odchyłów za pomocą IQR** to jedna z popularnych metod czyszczenia danych, która pomaga w identyfikacji i usuwaniu wartości ekstremalnych, mogących zaburzać wyniki modeli predykcyjnych. Metoda ta pozwala uzyskać lepszą jakość danych, co przekłada się na bardziej trafne prognozy i interpretacje.
+
+## Analiza składowych głównych (PCA) !!!!
+
+![img_2.png](img_2.png)
+
+Wykres przedstawia wyniki **analizy składowych głównych (PCA)** zredukowane do **dwóch składowych**. PCA to technika stosowana w celu redukcji wymiarowości danych, co pozwala na łatwiejszą wizualizację i analizę zmiennych, a także na poprawę działania modeli w przypadkach, gdy dane mają bardzo wiele cech.
+
+#### Dlaczego PCA jest ważne?
+1. **Redukcja wymiarowości**: Kiedy mamy dużą liczbę cech, niektóre z nich mogą być silnie skorelowane lub nadmiarowe. PCA pozwala zredukować te cechy do mniejszej liczby nowych, niezależnych składowych, które reprezentują większość zmienności w danych.
+
+2. **Zrozumienie struktury danych**: PCA ułatwia zrozumienie ukrytych wzorców w danych. Na wykresie widać, jak różne obserwacje (próbki) są rozproszone w przestrzeni nowych składowych głównych. Kolory na wykresie mogą reprezentować np. różne klasy (jak diagnozy: złośliwe lub łagodne guzy w przypadku analizy danych medycznych).
+
+#### Interpretacja wykresu:
+- **Oś X** (Pierwsza składowa): Reprezentuje największą część zmienności danych, co oznacza, że ta składowa najlepiej wyjaśnia różnice między próbkami.
+
+- **Oś Y** (Druga składowa): Reprezentuje drugą największą część zmienności danych, która nie została wyjaśniona przez pierwszą składową.
+
+- **Punkty na wykresie**: Każdy punkt na wykresie reprezentuje próbkę (np. dom, pacjenta, transakcję), a jego położenie pokazuje, jak próbka jest opisana przez dwie składowe główne.
+
+- **Kolorowanie punktów**: Kolory na wykresie reprezentują różne klasy lub grupy w danych (np. złośliwe i łagodne guzy). Obserwacje o podobnych cechach znajdują się bliżej siebie, co może pomóc w wykrywaniu klastrów.
+
+#### Co możemy zrobić z tymi informacjami?
+1. **Identyfikacja klastrów**: Jeśli dane tworzą wyraźne grupy na wykresie PCA, może to sugerować, że próbki należą do różnych kategorii (np. typów diagnoz). To jest szczególnie przydatne w przypadku analizy klasyfikacji lub grupowania.
+
+2. **Ocena stopnia zmienności**: Jeśli PCA skutecznie wyjaśnia większość zmienności danych przy użyciu tylko dwóch składowych, może to sugerować, że większość informacji w danych jest zawarta w tych dwóch składowych. Możemy więc zredukować liczbę zmiennych w modelu bez utraty istotnych informacji.
+
+3. **Lepsza wizualizacja**: PCA ułatwia wizualizację wielowymiarowych danych w dwóch wymiarach, co pozwala lepiej zrozumieć ich strukturę.
+
+#### Jak interpretować wartości:
+- **Punkty bliżej siebie**: Obserwacje (punkty) położone blisko siebie mają podobne wartości dla cech oryginalnych. Mogą należeć do tej samej klasy lub grupy.
+
+- **Punkty dalej od siebie**: Punkty odległe od siebie reprezentują próbki, które różnią się cechami. Może to sugerować, że należą do różnych grup (np. złośliwe vs łagodne diagnozy).
+
+#### Podsumowanie:
+Wykres PCA pomaga zredukować wymiarowość i wizualizować dane wielowymiarowe w dwóch wymiarach, ujawniając potencjalne wzorce i grupy w danych. Może to pomóc w dalszej analizie oraz w budowaniu modeli predykcyjnych.
 
 ## Modelowanie
 - Trenowanie modelu regresji liniowej.
@@ -488,22 +593,7 @@ Podczas oceny modeli regresji warto korzystać z kilku metryk, aby mieć pełen 
 - **Co możemy z tym zrobić**:
    - Jeśli widzimy systematyczne odchylenia (np. wszystkie wysokie wartości są źle przewidywane), możemy rozważyć przekształcenie zmiennych lub zastosowanie bardziej zaawansowanych modeli (np. regresji nieliniowej).
 
-### 2. Wykres **Rzeczywiste vs Przewidywane po usunięciu odchyłów**
-![plot_before_after_outliers.png](charts/plot_before_after_outliers.png)
-- **Po co tworzymy ten wykres**:
-  Pokazuje, jak zmieniły się przewidywania modelu po usunięciu wartości odstających (outliers). Pozwala to ocenić, czy model stał się bardziej dokładny po tej operacji.
-
-- **Jak go czytać**:
-   - Analogicznie do pierwszego wykresu, punkty leżące blisko czerwonej linii wskazują na dobrą zgodność modelu z rzeczywistymi danymi.
-   - Jeśli po usunięciu odchyłów wyniki są lepsze (punkty są bliżej linii), model działa bardziej precyzyjnie.
-
-- **Informacje, które dostajemy**:
-   - Możemy sprawdzić, jak usunięcie wartości odstających wpłynęło na jakość modelu.
-
-- **Co możemy z tym zrobić**:
-   - Jeśli po usunięciu outliers model działa lepiej, możemy zdecydować się na trzymanie tego podejścia przy kolejnych iteracjach modelowania. Możemy też porównać wyniki przed i po, aby ocenić skuteczność.
-
-### 3. **Wykres residuów (różnice rzeczywiste - przewidywane)**
+### 2. **Wykres residuów (różnice rzeczywiste - przewidywane)**
 ![residual_plot.png](charts/residual_plot.png)
 - **Po co tworzymy ten wykres**:
   Wykres residuów pokazuje, jak różnią się rzeczywiste wartości od przewidywanych w zależności od samych przewidywanych wartości. Pomaga zidentyfikować ewentualne wzorce błędów (np. systematyczne niedoszacowanie lub przeszacowanie modelu).
@@ -518,7 +608,7 @@ Podczas oceny modeli regresji warto korzystać z kilku metryk, aby mieć pełen 
 - **Co możemy z tym zrobić**:
    - Jeśli błędy nie są rozproszone losowo (np. mamy wzorzec liniowy lub kwadratowy), może to sugerować, że model nie radzi sobie z pewnymi typami danych i może wymagać bardziej zaawansowanych technik, jak regresja wielomianowa lub nieliniowa.
 
-### 4. Wykres **Rozkład residuów (błędy)**
+### 3. Wykres **Rozkład residuów (błędy)**
 ![residual_distribution_plot.png](charts/residual_distribution_plot.png)
 - **Po co tworzymy ten wykres**:
   Wykres pokazuje, jak są rozłożone różnice (błędy) między rzeczywistymi a przewidywanymi wartościami. Służy do oceny, czy błędy mają rozkład normalny, co jest jednym z założeń regresji liniowej.
